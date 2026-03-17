@@ -1,6 +1,8 @@
-# OpenClaw Finance Agent + Ollama (Local)
+# OpenClaw Finance Agent + Ollama Cloud (Pro)
 
-Complete deployment package for OpenClaw finance agent using GitHub source + **Ollama running locally** (no API key needed).
+Complete deployment package for OpenClaw finance agent using GitHub source + **Ollama Cloud API** with kimi-k2.5.
+
+**Requires:** Ollama Pro account and API key
 
 ## What Gets Installed
 
@@ -8,10 +10,19 @@ Complete deployment package for OpenClaw finance agent using GitHub source + **O
 - ✅ Python 3.11
 - ✅ Git
 - ✅ OpenClaw (from GitHub) → `D:\openclaw-source\`
-- ✅ **Ollama (local)** with kimi-k2.5 model (~5GB download)
+- ✅ **Ollama Cloud API** with kimi-k2.5
 - ✅ Finance agent with memory systems → `D:\openclaw\workspace-finance\`
 
-**NO API KEY REQUIRED** - Everything runs locally on your machine!
+**NO LOCAL MODEL DOWNLOAD** - Uses Ollama Cloud API!
+
+---
+
+## Prerequisites
+
+Before running the script, you need:
+
+1. **Ollama Pro account** - Sign up at https://ollama.com
+2. **API key** - Get from https://ollama.com/settings/api-keys
 
 ---
 
@@ -28,26 +39,46 @@ mkdir D:\temp\deploy -Force; cd D:\temp\deploy; Invoke-WebRequest -Uri "https://
 
 **This will:**
 - Download and install Node.js, Python, Git
-- Download and install Ollama (~200MB)
-- Download kimi-k2.5 model (~5GB) ⬅️ **This takes time!**
-- Start Ollama service automatically
 - Clone OpenClaw from GitHub
 - Build OpenClaw from source
+- Configure Ollama Cloud API
 - Create finance agent workspace
 - Install all dependencies
 
-**Total Time:** 15-30 minutes (mostly downloading the 5GB model)
+**Total Time:** 10-15 minutes
 
 ---
 
-## Step 3: Start the Agent (After Installation)
+## Step 3: Set Your Ollama Cloud API Key
+
+After installation:
+
+```powershell
+cd D:\openclaw\workspace-finance
+.\set-api-key.ps1
+```
+
+Or manually:
+```powershell
+[Environment]::SetEnvironmentVariable('OLLAMA_API_KEY', 'your-api-key-here', 'User')
+```
+
+**Get your API key from:** https://ollama.com/settings/api-keys
+
+---
+
+## Step 4: Restart PowerShell
+
+Close and reopen PowerShell as Administrator.
+
+---
+
+## Step 5: Start the Agent
 
 ```powershell
 cd D:\openclaw\workspace-finance
 .\start-agent.ps1
 ```
-
-That's it! No API key needed - Ollama runs locally on `http://localhost:11434`
 
 ---
 
@@ -55,28 +86,26 @@ That's it! No API key needed - Ollama runs locally on `http://localhost:11434`
 
 | File | Description |
 |------|-------------|
-| `deploy.ps1` | Main deployment script (installs Ollama locally) |
-| `start-agent.ps1` | Start OpenClaw with local Ollama |
+| `deploy.ps1` | Main deployment script (Ollama Cloud) |
+| `set-api-key.ps1` | Set Ollama Cloud API key |
+| `start-agent.ps1` | Start OpenClaw with Ollama Cloud |
 | `verify.py` | Verify installation |
 | `README.md` | This file |
-| `config.yaml` | Ollama local configuration |
+| `config.yaml` | Ollama Cloud configuration |
 
 ---
 
-## Managing Ollama
+## Managing Ollama Cloud
 
-### Check installed models:
-```powershell
-ollama list
-```
+### Check your API usage:
+Go to: https://ollama.com/settings/usage
 
-### Download additional models:
-```powershell
-ollama pull llama3.2      # Smaller, faster
-ollama pull mistral         # Good for coding
-ollama pull qwen2.5         # Multilingual
-ollama pull deepseek-coder  # Best for code
-```
+### Available models on Ollama Cloud:
+- `kimi-k2.5` (recommended)
+- `llama3.2`
+- `mistral`
+- `qwen2.5`
+- `deepseek-coder`
 
 ### Switch models:
 Edit `D:\openclaw\config\config.yaml`:
@@ -84,17 +113,9 @@ Edit `D:\openclaw\config\config.yaml`:
 llm:
   provider: ollama
   api:
-    base_url: http://localhost:11434/api
-  model: llama3.2  # Change this to any model you pulled
-```
-
-### Stop/Start Ollama:
-```powershell
-# Stop Ollama
-Get-Process ollama | Stop-Process
-
-# Start Ollama
-ollama serve
+    base_url: https://api.ollama.com/v1
+    api_key: ${OLLAMA_API_KEY}
+  model: llama3.2  # Change to any model above
 ```
 
 ---
@@ -107,7 +128,6 @@ ollama serve
 | Config file | `D:\openclaw\config\config.yaml` |
 | Finance agent | `D:\openclaw\workspace-finance\` |
 | ByteRover memory | `D:\openclaw\workspace-finance\.brv\` |
-| Ollama models | `C:\Users\%USERNAME%\.ollama\models\` |
 | QMD database | `C:\Users\%USERNAME%\.config\qmd\qmd.db` |
 
 ---
@@ -123,22 +143,21 @@ python verify.py
 
 ## Troubleshooting
 
-### "Ollama not found"
+### "OLLAMA_API_KEY not set"
+**Fix:**
 ```powershell
-# Add to PATH
-$env:Path += ";C:\Users\$env:USERNAME\AppData\Local\Programs\Ollama"
-[Environment]::SetEnvironmentVariable("Path", $env:Path, "User")
+[Environment]::SetEnvironmentVariable('OLLAMA_API_KEY', 'your-key', 'User')
+# Then restart PowerShell
 ```
 
-### "Model download failed"
-```powershell
-# Try again
-ollama pull kimi-k2.5
-```
+### "API connection failed"
+**Check:**
+- Is your API key correct?
+- Do you have Ollama Pro subscription?
+- Check status: https://ollama.com/status
 
-### "Out of disk space"
-- Ollama models need ~5GB each
-- Make sure you have 10GB+ free on C:\ drive
+### "Out of API credits"
+**Check usage:** https://ollama.com/settings/usage
 
 ---
 
@@ -146,6 +165,7 @@ ollama pull kimi-k2.5
 
 - OpenClaw: https://github.com/openclaw/openclaw
 - Ollama: https://ollama.com
+- Ollama API Keys: https://ollama.com/settings/api-keys
 - Ollama Models: https://ollama.com/library
 
 ---
@@ -157,10 +177,12 @@ ollama pull kimi-k2.5
 mkdir D:\temp\deploy -Force; cd D:\temp\deploy; Invoke-WebRequest -Uri "https://raw.githubusercontent.com/openclaw277-byte/openclaw-finance-agent/main/deploy.ps1" -OutFile "deploy.ps1"; Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force; .\deploy.ps1
 ```
 
-**Then start:**
+**Then set API key and start:**
 ```powershell
 cd D:\openclaw\workspace-finance
+.\set-api-key.ps1
+# Restart PowerShell
 .\start-agent.ps1
 ```
 
-**Done!** Your finance agent is running with **local Ollama** - no API keys, no internet needed after setup, completely private!
+**Done!** Your finance agent is running with **Ollama Cloud (kimi-k2.5)** - fast, no local GPU needed!
