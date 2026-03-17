@@ -1,0 +1,49 @@
+# OpenClaw Configuration - Ollama API (Cloud)
+# This is the configuration file for OpenClaw using Ollama API
+
+llm:
+  provider: ollama
+  api:
+    # Ollama API endpoint (cloud, not local)
+    base_url: https://api.ollama.com/v1
+    
+    # Alternative: Your own Ollama instance
+    # base_url: https://your-ollama-server.com/api
+    
+    # API key (if required by provider)
+    # api_key: your-api-key-here
+  
+  # Model configuration
+  model: kimi-k2.5
+  
+  # Available models:
+  # - kimi-k2.5 (recommended)
+  # - llama3.2
+  # - mistral
+  # - qwen2.5
+  # - deepseek-coder
+  
+  # Generation settings
+  temperature: 0.7
+  max_tokens: 4096
+  top_p: 0.9
+
+# Gateway configuration
+gateway:
+  enabled: true
+  port: 8080
+  host: "127.0.0.1"
+
+# Memory systems
+memory:
+  byterover:
+    enabled: true
+    auto_sync: true
+  qmd:
+    enabled: true
+    auto_index: true
+
+# Logging
+logging:
+  level: info
+  file: "~/.openclaw/logs/openclaw.log"
